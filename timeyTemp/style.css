@@ -60,26 +60,4 @@ p{
   }
 }
 
-@media only screen
-  and (min-device-width: 320px)
-  and (max-device-width: 568px)
-  and (-webkit-min-device-pixel-ratio: 2) {
-      .productInfo{
-    width:85%;
-    float:none;
-    margin: 20px auto;
-    padding: 20px;
-    text-align:center;
-  }
-  .videoSection{
-    float:none;
-    width:60%;
-    margin: 0 auto;
-  }
-  .container{
-    margin: 20px 0 0 0;
-  }
-  body{
-  }
 
-}
