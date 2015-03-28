@@ -1,0 +1,61 @@
+video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+body{
+  background: #8040A0;
+  margin: 0;
+}
+.videoSection{
+  width:50%;
+  height: auto;
+  background: #aaccdd;
+  float:left;
+  border-style: solid;
+  border-width: 10px 10px 20px 10px;
+  border-radius:15px;
+  border-color:#420D5D;
+}
+.productInfo {
+  color:white;
+  width:40%;
+  float:left;
+  margin: 100px 0 0 40px;
+}
+.container{
+  /*height:300px;*/
+  max-width: 700px;
+  margin: 50px auto 0 auto;
+}
+h1{
+  font-size: 100px;
+  margin:0;
+  padding:0;
+  font-family: 'Nunito', sans-serif;
+}
+p{
+  font-size: 30px;
+  margin:0;
+  padding:0;
+  font-family: 'Nunito', sans-serif;
+}
+@media (max-width: 700px){
+  .productInfo{
+    width:85%;
+    float:none;
+    margin: 20px auto;
+    padding: 20px;
+    text-align:center;
+  }
+  .videoSection{
+    float:none;
+    width:60%;
+    margin: 0 auto;
+  }
+  .container{
+    margin: 20px 0 0 0;
+  }
+  body{
+  }
+}
