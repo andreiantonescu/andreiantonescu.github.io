@@ -40,7 +40,28 @@ p{
   padding:0;
   font-family: 'Nunito', sans-serif;
 }
-@media (max-width: 500px){
+@media (max-width: 700px){
+  .productInfo{
+    width:85%;
+    float:none;
+    margin: 20px auto;
+    padding: 20px;
+    text-align:center;
+  }
+  .videoSection{
+    float:none;
+    width:60%;
+    margin: 0 auto;
+  }
+  .container{
+    margin: 20px 0 0 0;
+  }
+  body{
+  }
+}
+@media (max-device-width: 320px)
+ and (-webkit-min-device-pixel-ratio: 2)
+{
   .productInfo{
     width:85%;
     float:none;
