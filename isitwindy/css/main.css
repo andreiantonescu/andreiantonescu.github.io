@@ -283,7 +283,11 @@ textarea {
   position: fixed;
   top: 50%;
   left: 50%;
+  
   transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  
   font-size: 80px;
   color: #fff;
   text-align: center;
@@ -291,5 +295,4 @@ textarea {
   font-style: normal;
   font-weight: 400;
   line-height: 1.1;
-  
 }

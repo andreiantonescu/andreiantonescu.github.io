@@ -4,6 +4,7 @@ var numberOfParticles = 100;
 var temp = "temp";
 var wind;
 var windAngle;
+var windMag;
 
 Number.prototype.map = function ( in_min , in_max , out_min , out_max ) {
     return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
@@ -31,7 +32,7 @@ function getHsb(temp){
       {
         'h' : 0,
         's' : 80,
-        'b' : 100
+        'b' : 98
       };
 
     if(temp>32){
@@ -53,20 +54,23 @@ function drawBackground(hsb){
 }
 
 
-function drawMainArrow(hsb){
+function drawMainArrow(hsb, x, y){
     push();
-    translate(32, height - 32);
+    translate(x, y-48);
     // Rotate by the wind's angle
+    //draw base
     rotate(wind.heading() + PI/2);
     noStroke();
     fill(255);
     ellipse(0, 0, 48, 48);
 
+    //draw arrow
+    scale(0.75);
     stroke(hsb.h, hsb.s, hsb.b);
-    strokeWeight(3);
+    strokeWeight(2);
     line(0, -16, 0, 16);
 
-    	noStroke();
+    noStroke();
     fill(hsb.h, hsb.s, hsb.b);
     triangle(0, -18, -6, -10, 6, -10);
     pop();
@@ -165,7 +169,6 @@ function setup() {
     }
     
     colorMode(HSB, 360, 100, 100, 1);
-    
 }
 
 function draw() {
@@ -173,13 +176,21 @@ function draw() {
   if(temp!="temp"){
       hsb = getHsb(temp);
       drawBackground(hsb);
-    
+      
       for(i=0; i<numberOfParticles; i++){
-          	particles[i].draw(wind, i);
+          particles[i].draw(wind, i);
           arrows[i].draw(wind,i);
       }
-    
-      	drawMainArrow(hsb);
+      	//drawMainArrow(hsb, $(".message").offset().left + $(".message").width()/2, $(".message").offset().top);
+        //console.log(status.length);
+        if(windMag<2)
+            $(".message").html("Barely windy");
+        else if(2<windMag<5)
+            $(".message").html("A bit windy");
+        else if(5<windMag<9)
+            $(".message").html("Quite windy");
+        else if(windMag>9)
+            $(".message").html("Very windy");
     }
 }
 
@@ -188,17 +199,17 @@ function gotWeather(weather) {
     var angle = radians(Number(weather.wind.deg));
     windAngle = angle;
     // Get the wind speed
-    var windmag = Number(weather.wind.speed);
+    windMag = Number(weather.wind.speed);
     temp = floor(weather.main.temp);
   
     // Display as HTML elements
-    console.log("wind m/s " + windmag + ", km/h " + windmag*3.6);
+    console.log("wind m/s " + windMag + ", km/h " + windMag*3.6);
     console.log("tempC: " + temp);
   
     // Make a vector
     wind = p5.Vector.fromAngle(angle);
     // multiply wind magnitude
-    wind.mult(windmag/2);
+    wind.mult(windMag/2 	);
 }
 
 function windowResized() {
