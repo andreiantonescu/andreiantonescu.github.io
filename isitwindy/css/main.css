@@ -278,3 +278,15 @@ textarea {
         page-break-after: avoid;
     }
 }
+
+.message{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 80px;
+  color: #fff;
+  text-align: center;
+  font-family: "abril-fatface";
+  line-height: 1.1;
+}

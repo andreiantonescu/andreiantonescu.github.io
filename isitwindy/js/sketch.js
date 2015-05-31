@@ -1,10 +1,14 @@
-var particle;
-var temp;
+var particles = [];
+var arrows = [];
+var numberOfParticles = 100;
+var temp = "temp";
 var wind;
+var windAngle;
 
 Number.prototype.map = function ( in_min , in_max , out_min , out_max ) {
     return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
 }
+
 
 function calculateHSL(hsb){
     // determine the lightness in the range [0,100]
@@ -21,43 +25,111 @@ function calculateHSL(hsb){
     return hsl;
 }
 
-function drawHue(temp){
+
+function getHsb(temp){
     var hsb =
-    {
-      'h' : 0,
-      's' : 80,
-      'b' : 100
-    };
+      {
+        'h' : 0,
+        's' : 80,
+        'b' : 100
+      };
 
     if(temp>32){
-      temp = 32;
-    }
+       temp = 32;
+      }
     else if(temp<-10){
-      temp = -10;
+       temp = -10;
     }
     
     hsb.h = 200 - temp.map(0, 40, 0, 250);
+
+    return hsb;
+}
+
+function drawBackground(hsb){
     var hsl = calculateHSL(hsb);
     background(hsb.h, hsb.s, hsb.b);
     $('body').css('background', 'hsl(' + hsl.h + ',' + hsl.s + '%,' + hsl.l + '%)'); // css HSL
 }
 
+
+function drawMainArrow(hsb){
+    push();
+    translate(32, height - 32);
+    // Rotate by the wind's angle
+    rotate(wind.heading() + PI/2);
+    noStroke();
+    fill(255);
+    ellipse(0, 0, 48, 48);
+
+    stroke(hsb.h, hsb.s, hsb.b);
+    strokeWeight(3);
+    line(0, -16, 0, 16);
+
+    	noStroke();
+    fill(hsb.h, hsb.s, hsb.b);
+    triangle(0, -18, -6, -10, 6, -10);
+    pop();
+}
+
+
+//bound check
+function boundCheck(position){
+    if (position.x > width)  position.x = 0;
+    if (position.x < 0)      position.x = width;
+    if (position.y > height) position.y = 0;
+    if (position.y < 0)      position.y = height;
+}
+
 // particle class
 function Particle () {
-    this.position = createVector(width/2, height/2);
+    this.position = createVector(random(width), random(height));
+    this.size = random(8);
+    this.opacity = random(1);
     
-    this.draw = function(speed){
+    this.draw = function(speed, i){
       this.position.add(speed);
+
+      // add some randomness
+      this.position.x = this.position.x + cos(i)/10;
+      this.position.y = this.position.y + sin(i)/10;
+      this.size = this.size;
       
-      // bound checks
-      if (this.position.x > width)  this.position.x = 0;
-      if (this.position.x < 0)      this.position.x = width;
-      if (this.position.y > height) this.position.y = 0;
-      if (this.position.y < 0)      this.position.y = height;
+      boundCheck(this.position);
       
       noStroke();
-      fill(color(255,200));
-      ellipse(this.position.x, this.position.y, 16, 16);
+      fill(color(25, this.opacity));
+      ellipse(this.position.x, this.position.y, this.size, this.size);
+    }   
+}
+
+// arrow class
+function Arrow () {
+    this.position = createVector(random(width), random(height));
+    this.size = random(10);
+    this.opacity = random(1);
+    
+    this.draw = function(speed, i){
+      this.position.add(speed);
+
+      // add some randomness
+      this.position.x = this.position.x + cos(i)/10;
+      this.position.y = this.position.y + sin(i)/10;
+      this.size = this.size;
+      
+      boundCheck(this.position);
+      
+      stroke(color(255, this.opacity));
+      strokeWeight(1);
+      push();
+      angleMode(RADIANS);
+      translate(this.position.x, this.position.y);
+      rotate(windAngle);
+      line(0, 0, this.size*2 ,0);
+      //arrow
+      line(this.size*2, 0, this.size*1.4, -this.size/2);
+      line(this.size*2, 0, this.size*1.4, this.size/2);
+      pop();
     }   
 }
 
@@ -81,20 +153,40 @@ function setup() {
   } );
   
     wind = createVector();
-    particle = new Particle(); 
-
+    
+    numberOfParticles = floor(width/14);
+    
+    for(i=0; i<numberOfParticles; i++){
+      particle = new Particle(); 
+      particles.push(particle);
+      
+      arrow = new Arrow();
+      arrows.push(arrow);
+    }
+    
     colorMode(HSB, 360, 100, 100, 1);
+    
 }
 
 function draw() {
-    drawHue(temp);
-    particle.draw(wind);
-    //console.log(particle.position);
+  // if temperature was read
+  if(temp!="temp"){
+      hsb = getHsb(temp);
+      drawBackground(hsb);
+    
+      for(i=0; i<numberOfParticles; i++){
+          	particles[i].draw(wind, i);
+          arrows[i].draw(wind,i);
+      }
+    
+      	drawMainArrow(hsb);
+    }
 }
 
 function gotWeather(weather) {
     // Get the angle (convert to radians)
     var angle = radians(Number(weather.wind.deg));
+    windAngle = angle;
     // Get the wind speed
     var windmag = Number(weather.wind.speed);
     temp = floor(weather.main.temp);
@@ -111,4 +203,17 @@ function gotWeather(weather) {
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+    
+    particles = [];
+    arrows = [];
+    
+    numberOfParticles = floor(width/14);
+    
+    for(i=0; i<numberOfParticles; i++){
+      particle = new Particle(); 
+      particles.push(particle);
+      
+      arrow = new Arrow();
+      arrows.push(arrow);
+    }
 }
