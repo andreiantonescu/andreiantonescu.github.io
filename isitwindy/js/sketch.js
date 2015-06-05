@@ -126,7 +126,6 @@ function Arrow () {
       stroke(color(255, this.opacity));
       strokeWeight(1);
       push();
-      angleMode(RADIANS);
       translate(this.position.x, this.position.y);
       rotate(windAngle);
       line(0, 0, this.size*2 ,0);
@@ -152,17 +151,19 @@ function setup() {
       console.log(location.city);
       console.log("long: " + location.lon);
       console.log("lat: " + location.lat);
-      console.log('https://api.forecast.io/forecast/b8ace96330f01d017ae0b275adccc0bd/' + location.lat +',' + location.lon);
       jQuery.ajax( { 
-         url: 'https://api.forecast.io/forecast/b8ace96330f01d017ae0b275adccc0bd/' + location.lat +',' + location.lon, 
+         url: 'http://api.wunderground.com/api/16edb6959424f26b/conditions/settings/q/'+ location.lat +',' + location.lon + '.json', 
          type: 'GET', 
           dataType: 'jsonp',
           cache: false,
           headers: { "Content-type": "application/json" },
           success: function(weather) {
-              console.log((weather.currently.temperature-32)* 5 / 9); // fah to celsius
-              console.log(weather.currently.windSpeed*1.60934); // mph to kmph
-              gotWeather((weather.currently.temperature-32)* 5 / 9, weather.currently.windSpeed*1.60934, weather.currently.windBearing);
+              console.log('http://api.wunderground.com/api/16edb6959424f26b/conditions/settings/q/'+ location.lat +',' + location.lon + '.json')
+              console.log(weather.current_observation.wind_kph)
+              console.log(weather.current_observation.wind_gust_kph)
+              console.log((float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2)
+              wind = (float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2
+              gotWeather(weather.current_observation.temp_c, wind, weather.current_observation.wind_degrees);
             }
             } );
             }
@@ -183,6 +184,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100, 1);
 }
 
+
 function draw() {
   // if temperature was read
   if(temp!="temp"){
@@ -197,18 +199,19 @@ function draw() {
         //console.log(status.length);
         if(windMag<10)
             $(".message").html("Barely windy");
-        else if(10<windMag<20)
+        else if(10<windMag && windMag<20)
             $(".message").html("A bit windy");
-        else if(20<windMag<30)
+        else if(20<windMag && windMag<30)
             $(".message").html("Quite windy");
         else if(windMag>30)
             $(".message").html("Very windy");
+        
     }
 }
 
 function gotWeather(temperature, windSpeed, windDirection) {
     // Get the angle (convert to radians)
-    var angle = radians(Number(windDirection));
+    var angle = radians(180-windDirection);
     windAngle = angle;
     // Get the wind speed
     windMag = Number(windSpeed);
