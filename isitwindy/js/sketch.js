@@ -103,6 +103,18 @@ function Particle () {
       if (distance<30){
         this.position.add(repulsion)
       }
+      else if (distance<60){
+        repulsion.div(2)
+        this.position.add(repulsion)
+      }
+      else if (distance<90){
+        repulsion.div(3)
+        this.position.add(repulsion)
+      }
+      else if (distance<120){
+        repulsion.div(4)
+        this.position.add(repulsion)
+      }
       
       this.position.add(speed)
 
@@ -135,6 +147,18 @@ function Arrow () {
       repulsion.normalize()
      
       if (distance<30){
+        this.position.add(repulsion)
+      }
+      else if (distance<60){
+        repulsion.div(2)
+        this.position.add(repulsion)
+      }
+      else if (distance<90){
+        repulsion.div(3)
+        this.position.add(repulsion)
+      }
+      else if (distance<120){
+        repulsion.div(4)
         this.position.add(repulsion)
       }
       
@@ -186,6 +210,7 @@ function setup() {
               console.log(weather.current_observation.wind_kph)
               console.log(weather.current_observation.wind_gust_kph)
               console.log((float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2)
+              console.log(weather.current_observation.temp_c)
               wind = (float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2
               gotWeather(weather.current_observation.temp_c, wind, weather.current_observation.wind_degrees);
             }
