@@ -210,10 +210,9 @@ function setup() {
               console.log(weather.current_observation.wind_kph)
               console.log(weather.current_observation.wind_gust_kph)
               console.log((float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2)
-<<<<<<< HEAD
+
               console.log(weather.current_observation.temp_c)
-=======
->>>>>>> 42c4eeb613a951fe46b20fb480327c03b480d0a9
+
               wind = (float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2
               gotWeather(weather.current_observation.temp_c, wind, weather.current_observation.wind_degrees);
             }
@@ -272,11 +271,7 @@ function gotWeather(temperature, windSpeed, windDirection) {
     // Make a vector
     wind = p5.Vector.fromAngle(angle);
     // multiply wind magnitude
-<<<<<<< HEAD
     wind.mult(windMag/4);
-=======
-    wind.mult(windMag/3);
->>>>>>> 42c4eeb613a951fe46b20fb480327c03b480d0a9
 }
 
 function windowResized() {
