@@ -143,17 +143,29 @@ function setup() {
   
     jQuery.ajax( { 
       url: 'http://ip-api.com/json', 
-      type: 'POST', 
+      type: 'GET', 
       dataType: 'jsonp',
+      cache: false,
+      headers: { "Content-type": "application/json" },
       success: function(location) {
       // get city - update to long & lat
       console.log(location.city);
       console.log("long: " + location.lon);
       console.log("lat: " + location.lat);
-      // Request the data from openweathermap
-      //loadJSON('http://api.openweathermap.org/data/2.5/weather?q=bucharest&units=metric', gotWeather);
-      loadJSON('http://api.openweathermap.org/data/2.5/weather?lat='+ location.lat + '&lon=' + location.lon + "&units=metric", gotWeather);
-      }
+      console.log('https://api.forecast.io/forecast/b8ace96330f01d017ae0b275adccc0bd/' + location.lat +',' + location.lon);
+      jQuery.ajax( { 
+         url: 'https://api.forecast.io/forecast/b8ace96330f01d017ae0b275adccc0bd/' + location.lat +',' + location.lon, 
+         type: 'GET', 
+          dataType: 'jsonp',
+          cache: false,
+          headers: { "Content-type": "application/json" },
+          success: function(weather) {
+              console.log((weather.currently.temperature-32)* 5 / 9); // fah to celsius
+              console.log(weather.currently.windSpeed*1.60934); // mph to kmph
+              gotWeather((weather.currently.temperature-32)* 5 / 9, weather.currently.windSpeed*1.60934, weather.currently.windBearing);
+            }
+            } );
+            }
   } );
   
     wind = createVector();
@@ -183,33 +195,29 @@ function draw() {
       }
       	//drawMainArrow(hsb, $(".message").offset().left + $(".message").width()/2, $(".message").offset().top);
         //console.log(status.length);
-        if(windMag<2)
+        if(windMag<10)
             $(".message").html("Barely windy");
-        else if(2<windMag<5)
+        else if(10<windMag<20)
             $(".message").html("A bit windy");
-        else if(5<windMag<9)
+        else if(20<windMag<30)
             $(".message").html("Quite windy");
-        else if(windMag>9)
+        else if(windMag>30)
             $(".message").html("Very windy");
     }
 }
 
-function gotWeather(weather) {
+function gotWeather(temperature, windSpeed, windDirection) {
     // Get the angle (convert to radians)
-    var angle = radians(Number(weather.wind.deg));
+    var angle = radians(Number(windDirection));
     windAngle = angle;
     // Get the wind speed
-    windMag = Number(weather.wind.speed);
-    temp = floor(weather.main.temp);
-  
-    // Display as HTML elements
-    console.log("wind m/s " + windMag + ", km/h " + windMag*3.6);
-    console.log("tempC: " + temp);
-  
+    windMag = Number(windSpeed);
+    temp = floor(temperature);
+
     // Make a vector
     wind = p5.Vector.fromAngle(angle);
     // multiply wind magnitude
-    wind.mult(windMag/2 	);
+    wind.mult(windMag/3);
 }
 
 function windowResized() {
