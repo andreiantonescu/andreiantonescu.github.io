@@ -32,7 +32,7 @@ function getHsb(temp){
       {
         'h' : 0,
         's' : 80,
-        'b' : 98
+        'b' : 96
       };
 
     if(temp>32){
@@ -90,9 +90,21 @@ function Particle () {
     this.position = createVector(random(width), random(height));
     this.size = random(8);
     this.opacity = random(1);
-    
-    this.draw = function(speed, i){
-      this.position.add(speed);
+
+    this.draw = function(speed, i, mouseX, mouseY){
+
+      mouse = createVector(mouseX, mouseY);
+      normalizedPosition = this.position.copy();
+      distance = mouse.dist(normalizedPosition);
+
+      repulsion = createVector(normalizedPosition.x - mouse.x - sin(i), normalizedPosition.y - mouse.y - cos(i));
+      repulsion.normalize()
+     
+      if (distance<30){
+        this.position.add(repulsion)
+      }
+      
+      this.position.add(speed)
 
       // add some randomness
       this.position.x = this.position.x + cos(i)/10;
@@ -113,7 +125,19 @@ function Arrow () {
     this.size = random(10);
     this.opacity = random(1);
     
-    this.draw = function(speed, i){
+    this.draw = function(speed, i, mouseX, mouseY){
+      
+      mouse = createVector(mouseX, mouseY);
+      normalizedPosition = this.position.copy();
+      distance = mouse.dist(normalizedPosition);
+
+      repulsion = createVector(normalizedPosition.x - mouse.x - sin(i), normalizedPosition.y - mouse.y - cos(i));
+      repulsion.normalize()
+     
+      if (distance<30){
+        this.position.add(repulsion)
+      }
+      
       this.position.add(speed);
 
       // add some randomness
@@ -126,7 +150,6 @@ function Arrow () {
       stroke(color(255, this.opacity));
       strokeWeight(1);
       push();
-      angleMode(RADIANS);
       translate(this.position.x, this.position.y);
       rotate(windAngle);
       line(0, 0, this.size*2 ,0);
@@ -143,17 +166,31 @@ function setup() {
   
     jQuery.ajax( { 
       url: 'http://ip-api.com/json', 
-      type: 'POST', 
+      type: 'GET', 
       dataType: 'jsonp',
+      cache: false,
+      headers: { "Content-type": "application/json" },
       success: function(location) {
       // get city - update to long & lat
       console.log(location.city);
       console.log("long: " + location.lon);
       console.log("lat: " + location.lat);
-      // Request the data from openweathermap
-      //loadJSON('http://api.openweathermap.org/data/2.5/weather?q=bucharest&units=metric', gotWeather);
-      loadJSON('http://api.openweathermap.org/data/2.5/weather?lat='+ location.lat + '&lon=' + location.lon + "&units=metric", gotWeather);
-      }
+      jQuery.ajax( { 
+         url: 'http://api.wunderground.com/api/16edb6959424f26b/conditions/settings/q/'+ location.lat +',' + location.lon + '.json', 
+         type: 'GET', 
+          dataType: 'jsonp',
+          cache: false,
+          headers: { "Content-type": "application/json" },
+          success: function(weather) {
+              console.log('http://api.wunderground.com/api/16edb6959424f26b/conditions/settings/q/'+ location.lat +',' + location.lon + '.json')
+              console.log(weather.current_observation.wind_kph)
+              console.log(weather.current_observation.wind_gust_kph)
+              console.log((float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2)
+              wind = (float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2
+              gotWeather(weather.current_observation.temp_c, wind, weather.current_observation.wind_degrees);
+            }
+            } );
+            }
   } );
   
     wind = createVector();
@@ -171,6 +208,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100, 1);
 }
 
+
 function draw() {
   // if temperature was read
   if(temp!="temp"){
@@ -178,38 +216,35 @@ function draw() {
       drawBackground(hsb);
       
       for(i=0; i<numberOfParticles; i++){
-          particles[i].draw(wind, i);
-          arrows[i].draw(wind,i);
+          particles[i].draw(wind, i, mouseX, mouseY);
+          arrows[i].draw(wind, i , mouseX, mouseY);
       }
       	//drawMainArrow(hsb, $(".message").offset().left + $(".message").width()/2, $(".message").offset().top);
         //console.log(status.length);
-        if(windMag<2)
+        if(windMag<10)
             $(".message").html("Barely windy");
-        else if(2<windMag<5)
+        else if(10<windMag && windMag<20)
             $(".message").html("A bit windy");
-        else if(5<windMag<9)
+        else if(20<windMag && windMag<30)
             $(".message").html("Quite windy");
-        else if(windMag>9)
+        else if(windMag>30)
             $(".message").html("Very windy");
+        
     }
 }
 
-function gotWeather(weather) {
+function gotWeather(temperature, windSpeed, windDirection) {
     // Get the angle (convert to radians)
-    var angle = radians(Number(weather.wind.deg));
+    var angle = radians(180-windDirection);
     windAngle = angle;
     // Get the wind speed
-    windMag = Number(weather.wind.speed);
-    temp = floor(weather.main.temp);
-  
-    // Display as HTML elements
-    console.log("wind m/s " + windMag + ", km/h " + windMag*3.6);
-    console.log("tempC: " + temp);
-  
+    windMag = Number(windSpeed);
+    temp = floor(temperature);
+
     // Make a vector
     wind = p5.Vector.fromAngle(angle);
     // multiply wind magnitude
-    wind.mult(windMag/2 	);
+    wind.mult(windMag/4);
 }
 
 function windowResized() {
