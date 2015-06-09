@@ -250,6 +250,13 @@ function draw() {
           particles[i].draw(wind, i, mouseX, mouseY);
           arrows[i].draw(wind, i , mouseX, mouseY);
       }
+      //mobile
+      if(touchIsDown){
+        for(i=0; i<numberOfParticles; i++){
+          particles[i].draw(wind, i, touchX, touchY);
+          arrows[i].draw(wind, i , touchX, touchY);
+        }
+      }
       	//drawMainArrow(hsb, $(".message").offset().left + $(".message").width()/2, $(".message").offset().top);
         //console.log(status.length);
         if(windMag<10)
