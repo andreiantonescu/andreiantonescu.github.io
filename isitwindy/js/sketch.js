@@ -184,11 +184,8 @@ function Arrow () {
     }   
 }
 
-
-function setup() {
-    createCanvas($(window).width(), $(window).height());
-  
-    jQuery.ajax( { 
+function getData() {
+      jQuery.ajax( { 
       url: 'http://ip-api.com/json', 
       type: 'GET', 
       dataType: 'jsonp',
@@ -207,16 +204,25 @@ function setup() {
           headers: { "Content-type": "application/json" },
           success: function(weather) {
               console.log('http://api.wunderground.com/api/16edb6959424f26b/conditions/settings/q/'+ location.lat +',' + location.lon + '.json')
-              console.log(weather.current_observation.wind_kph);
-              console.log(weather.current_observation.wind_gust_kph);
-              console.log((float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2);
-              console.log(weather.current_observation.temp_c);
-              wind = (float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2;
+              console.log(weather.current_observation.wind_kph)
+              console.log(weather.current_observation.wind_gust_kph)
+              //console.log((float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2)
+
+              console.log(weather.current_observation.temp_c)
+
+              //wind = (float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2
+              wind = float(weather.current_observation.wind_gust_kph);
               gotWeather(weather.current_observation.temp_c, wind, weather.current_observation.wind_degrees);
             }
             } );
             }
   } );
+}
+
+function setup() {
+    createCanvas($(window).width(), $(window).height());
+  
+    getData();
   
     wind = createVector();
     
