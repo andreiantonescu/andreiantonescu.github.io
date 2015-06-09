@@ -246,12 +246,14 @@ function draw() {
       hsb = getHsb(temp);
       drawBackground(hsb);
       
-      for(i=0; i<numberOfParticles; i++){
-          particles[i].draw(wind, i, mouseX, mouseY);
-          arrows[i].draw(wind, i , mouseX, mouseY);
+      if(!touchIsDown){
+        for(i=0; i<numberOfParticles; i++){
+            particles[i].draw(wind, i, mouseX, mouseY);
+            arrows[i].draw(wind, i , mouseX, mouseY);
+        }
       }
       //mobile
-      if(touchIsDown){
+      else if(touchIsDown){
         for(i=0; i<numberOfParticles; i++){
           particles[i].draw(wind, i, touchX, touchY);
           arrows[i].draw(wind, i , touchX, touchY);
