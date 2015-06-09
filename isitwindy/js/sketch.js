@@ -246,18 +246,10 @@ function draw() {
       hsb = getHsb(temp);
       drawBackground(hsb);
       
-      if(!touchIsDown){
-        for(i=0; i<numberOfParticles; i++){
-            particles[i].draw(wind, i, mouseX, mouseY);
-            arrows[i].draw(wind, i , mouseX, mouseY);
-        }
-      }
-      //mobile
-      else if(touchIsDown){
-        for(i=0; i<numberOfParticles; i++){
-          particles[i].draw(wind, i, touchX, touchY);
-          arrows[i].draw(wind, i , touchX, touchY);
-        }
+      // removed mobile for now
+      for(i=0; i<numberOfParticles; i++){
+          particles[i].draw(wind, i, mouseX, mouseY);
+          arrows[i].draw(wind, i , mouseX, mouseY);
       }
       	//drawMainArrow(hsb, $(".message").offset().left + $(".message").width()/2, $(".message").offset().top);
         //console.log(status.length);
