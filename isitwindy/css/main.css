@@ -296,3 +296,9 @@ textarea {
   font-weight: 400;
   line-height: 1.1;
 }
+
+@media screen and (max-width: 500px) {
+    .message{
+        font-size: 60px;
+    }
+}
