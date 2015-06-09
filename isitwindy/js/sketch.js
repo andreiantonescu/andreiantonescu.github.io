@@ -256,6 +256,16 @@ function draw() {
             $(".message").html("Very windy");
         
     }
+    
+    $('html, body').on('touchstart touchmove', function(e){ 
+     //prevent native touch activity like scrolling
+     e.preventDefault(); 
+  	});
+	 	
+    // recheck weather data
+    if (floor((millis()/10)%60000) == 0){
+        getData();
+    }
 }
 
 function gotWeather(temperature, windSpeed, windDirection) {
