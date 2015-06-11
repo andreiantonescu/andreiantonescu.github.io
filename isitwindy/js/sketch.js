@@ -211,10 +211,10 @@ function getData() {
               console.log(weather.current_observation.temp_c)
 
               //wind = (float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2
-              if(float(weather.current_observation.wind_gust_kph) < 1){
+              if(max(float(weather.current_observation.wind_gust_kph), float(weather.current_observation.wind_kph)) < 1){
                 wind = 1.0;
               } else {
-                wind = float(weather.current_observation.wind_gust_kph); 
+                wind = max(float(weather.current_observation.wind_gust_kph), float(weather.current_observation.wind_kph));
               }
               gotWeather(weather.current_observation.temp_c, wind, weather.current_observation.wind_degrees);
             }
