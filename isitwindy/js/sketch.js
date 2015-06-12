@@ -214,7 +214,12 @@ function getData() {
               if(max(float(weather.current_observation.wind_gust_kph), float(weather.current_observation.wind_kph)) < 1){
                 wind = 1.0;
               } else {
-                wind = max(float(weather.current_observation.wind_gust_kph), float(weather.current_observation.wind_kph));
+                  if(float(weather.current_observation.wind_gust_kph) > float(weather.current_observation.wind_kph)){
+                    wind = 2*float(weather.current_observation.wind_gust_kph)/3 + float(weather.current_observation.wind_kph)/3;
+                  }
+                  else if(float(weather.current_observation.wind_gust_kph) <= float(weather.current_observation.wind_kph)){
+                    wind = float(weather.current_observation.wind_kph);
+                  }
               }
               gotWeather(weather.current_observation.temp_c, wind, weather.current_observation.wind_degrees);
             }
@@ -264,7 +269,7 @@ function draw() {
         else if(20<windMag && windMag<30)
             $(".message").html("Quite windy");
         else if(windMag>30)
-            $(".message").html("Very windy");
+            $(".message").html("Really windy");
         
     }
     
