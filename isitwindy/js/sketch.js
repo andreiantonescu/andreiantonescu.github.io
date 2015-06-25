@@ -262,14 +262,16 @@ function draw() {
       }
       	//drawMainArrow(hsb, $(".message").offset().left + $(".message").width()/2, $(".message").offset().top);
         //console.log(status.length);
-        if(windMag<10)
+        if(windMag<5)
             $(".message").html("Barely windy");
-        else if(10<windMag && windMag<20)
+        else if(5<=windMag && windMag<12)
             $(".message").html("A bit windy");
+        else if(12<=windMag && windMag<20)
+            $(".message").html("Rather windy");
         else if(20<windMag && windMag<30)
             $(".message").html("Quite windy");
         else if(windMag>30)
-            $(".message").html("Really windy");
+            $(".message").html("Outright windy");
         
     }
     
