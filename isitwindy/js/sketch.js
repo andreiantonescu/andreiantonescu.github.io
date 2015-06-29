@@ -236,6 +236,9 @@ function setup() {
     wind = createVector();
     
     numberOfParticles = floor(width/14);
+    if(numberOfParticles>90){
+      numberOfParticles = 90;
+    }
       
     for(i=0; i<numberOfParticles; i++){
       particle = new Particle(); 
@@ -307,6 +310,10 @@ function windowResized() {
     arrows = [];
     
     numberOfParticles = floor(width/14);
+    if(numberOfParticles>90){
+      numberOfParticles = 90;
+    }
+      
     
     for(i=0; i<numberOfParticles; i++){
       particle = new Particle(); 
