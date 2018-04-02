@@ -1,11 +1,12 @@
-var particles = []
-var arrows = []
-var numberOfParticles = 100
-var temp = "temp"
-// refactor wind, make object
-var wind
-var windAngle
-var windMag
+var particles = [] 
+var arrows = [] 
+var numberOfParticles = 0 
+var temp = 0
+var wind = {
+  angle: 0,
+  speed: 0,
+  vector: null
+}
 
 Number.prototype.map = function ( in_min , in_max , out_min , out_max ) {
     return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
@@ -25,7 +26,6 @@ function calculateHSL(hsb){
     if (isNaN(hsl.s)) hsl.s = 0; 
     return hsl
 }
-
 
 function getHsb(temp){
     var hsb =
@@ -53,32 +53,6 @@ function drawBackground(hsb) {
     $('body').css('background', 'hsl(' + hsl.h + ',' + hsl.s + '%,' + hsl.l + '%)') // css HSL
 }
 
-
-function drawMainArrow(hsb, x, y){
-    push()
-    translate(x, y-48)
-
-    // Rotate by the wind's angle
-    //draw base
-    rotate(wind.heading() + PI/2)
-    noStroke()
-    fill(255)
-    ellipse(0, 0, 48, 48)
-
-    //draw arrow
-    scale(0.75)
-    stroke(hsb.h, hsb.s, hsb.b)
-    strokeWeight(2)
-    line(0, -16, 0, 16)
-
-    noStroke()
-    fill(hsb.h, hsb.s, hsb.b)
-    triangle(0, -18, -6, -10, 6, -10)
-    pop()
-}
-
-
-//bound check
 function boundCheck(position){
     if (position.x > width)  position.x = 0
     if (position.x < 0)      position.x = width
@@ -86,7 +60,6 @@ function boundCheck(position){
     if (position.y < 0)      position.y = height
 }
 
-// particle class
 function Particle () {
     this.position = createVector(random(width), random(height))
     this.size = random(8)
@@ -132,7 +105,6 @@ function Particle () {
     }   
 }
 
-// arrow class
 function Arrow () {
     this.position = createVector(random(width), random(height))
     this.size = random(10)
@@ -176,7 +148,7 @@ function Arrow () {
       strokeWeight(1)
       push()
       translate(this.position.x, this.position.y)
-      rotate(windAngle);
+      rotate(wind.angle);
       line(0, 0, this.size*2 ,0)
       //arrow
       line(this.size*2, 0, this.size*1.4, -this.size/2)
@@ -185,51 +157,17 @@ function Arrow () {
     }   
 }
 
-function getData() {
-      jQuery.ajax( { 
-      url: 'http://ip-api.com/json', 
-      type: 'GET', 
-      dataType: 'jsonp',
-      cache: false,
-      headers: { "Content-type": "application/json" },
-      success: function(location) {
-      // get city - update to long & lat
-      console.log(location.city)
-      console.log("long: " + location.lon)
-      console.log("lat: " + location.lat)
-      jQuery.ajax( { 
-         url: 'http://api.wunderground.com/api/16edb6959424f26b/conditions/settings/q/'+ location.lat +',' + location.lon + '.json', 
-         type: 'GET', 
-          dataType: 'jsonp',
-          cache: false,
-          headers: { "Content-type": "application/json" },
-          success: function(weather) {
-              console.log('http://api.wunderground.com/api/16edb6959424f26b/conditions/settings/q/'+ location.lat +',' + location.lon + '.json')
-              console.log(weather.current_observation.wind_kph)
-              console.log(weather.current_observation.wind_gust_kph)
-              //console.log((float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2)
+function setWeather(temperature, windSpeed, windDirection) {
+  temp = floor(temperature)
 
-              console.log(weather.current_observation.temp_c)
-
-              //wind = (float(weather.current_observation.wind_kph) + float(weather.current_observation.wind_gust_kph))/2
-              if(max(float(weather.current_observation.wind_gust_kph), float(weather.current_observation.wind_kph)) < 1){
-                wind = 1.0;
-              } else {
-                  if(float(weather.current_observation.wind_gust_kph) > float(weather.current_observation.wind_kph)){
-                    wind = 2*float(weather.current_observation.wind_gust_kph)/3 + float(weather.current_observation.wind_kph)/3
-                  }
-                  else if(float(weather.current_observation.wind_gust_kph) <= float(weather.current_observation.wind_kph)){
-                    wind = float(weather.current_observation.wind_kph)
-                  }
-              }
-              gotWeather(weather.current_observation.temp_c, wind, weather.current_observation.wind_degrees)
-            }
-            } );
-            }
-  } );
+  wind.angle = radians(180 - windDirection)
+  wind.speed = Number(windSpeed)
+  wind.vector = p5.Vector.fromAngle(wind.angle) 
+  // multiply wind magnitude
+  wind.vector.mult(wind.speed)
 }
 
-function getData2(){
+function getData(){
   jQuery.ajax( { 
     url: 'http://ip-api.com/json', 
     type: 'GET', 
@@ -237,11 +175,6 @@ function getData2(){
     cache: false,
     headers: { "Content-type": "application/json" },
     success: function(location) {
-    // get city - update to long & lat
-      console.log(location.city);
-      console.log("long: " + location.lon)
-      console.log("lat: " + location.lat)
-
       jQuery.ajax( { 
         url: 'http://api.openweathermap.org/data/2.5/weather?lat=' + location.lat + '&lon=' + location.lon +  '&units=metric&APPID=4e6e342eef6a9a7f8ea3d5f3f95a7b84', 
         type: 'GET', 
@@ -250,6 +183,7 @@ function getData2(){
         headers: { "Content-type": "application/json" },
         success: function(weather) {
           console.log(weather)
+          setWeather(weather.main.temp, weather.wind.speed, weather.wind.deg)
         }
       });
   }
@@ -257,79 +191,59 @@ function getData2(){
 }
 
 function setup() {
+    particles = []
+    arrows = []
+    temp = 0
+
     createCanvas($(window).width(), $(window).height());
-  
-    getData2()
-  
-    wind = createVector()
-    
+    getData()
+
     numberOfParticles = floor(width/14)
     if(numberOfParticles>90){
       numberOfParticles = 90
-    }
-      
-    for(i=0; i<numberOfParticles; i++){
+    } 
+
+    for(i=0; i < numberOfParticles; i++){
       particle = new Particle() 
       particles.push(particle)
       
       arrow = new Arrow()
       arrows.push(arrow)
     }
-    
     colorMode(HSB, 360, 100, 100, 1)
 }
 
 
 function draw() {
   // if temperature was read
-  if(temp!="temp"){
+  if(temp && wind){
       hsb = getHsb(temp)
       drawBackground(hsb)
       
       // removed mobile for now
-      for(i=0; i<numberOfParticles; i++){
-          particles[i].draw(wind, i, mouseX, mouseY)
-          arrows[i].draw(wind, i , mouseX, mouseY)
+      for(i=0; i < numberOfParticles; i++){
+          particles[i].draw(wind.vector, i, mouseX, mouseY)
+          arrows[i].draw(wind.vector, i , mouseX, mouseY)
       }
-      	//drawMainArrow(hsb, $(".message").offset().left + $(".message").width()/2, $(".message").offset().top);
-        //console.log(status.length);
-        if(windMag<5)
-            $(".message").html("Barely windy")
-        else if(5 <= windMag && windMag < 12)
-            $(".message").html("A bit windy")
-        else if(12 <= windMag && windMag < 20)
-            $(".message").html("Rather windy")
-        else if(20 < windMag && windMag < 30)
-            $(".message").html("Quite windy")
-        else if(windMag > 30)
-            $(".message").html("Outright windy")
-        
+
+      if(wind.speed < 2)
+          $(".message").html("Barely windy")
+      else if(2 <= wind.speed && wind.speed < 6)
+          $(".message").html("A bit windy")
+      else if(6 <= wind.speed && wind.speed < 9)
+          $(".message").html("Quite windy")
+      else if(9 < wind.speed && wind.speed < 12)
+          $(".message").html("Really windy")
+      else if(wind.speed >= 12)
+          $(".message").html("Outright windy")
     }
     
     $('html, body').on('touchstart touchmove', function(e){ 
      //prevent native touch activity like scrolling
      e.preventDefault()
   	});
-	 	
-    // recheck weather data
-    if (floor((millis()/10)%60000) == 0){
-        getData()
-    }
 }
 
-function gotWeather(temperature, windSpeed, windDirection) {
-    // Get the angle (convert to radians)
-    var angle = radians(180-windDirection)
-    windAngle = angle
-    // Get the wind speed
-    windMag = Number(windSpeed)
-    temp = floor(temperature)
-
-    // Make a vector
-    wind = p5.Vector.fromAngle(angle)
-    // multiply wind magnitude
-    wind.mult(windMag/4)
-}
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight)
