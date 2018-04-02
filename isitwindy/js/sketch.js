@@ -1,15 +1,15 @@
-var particles = [];
-var arrows = [];
-var numberOfParticles = 100;
-var temp = "temp";
-var wind;
-var windAngle;
-var windMag;
+var particles = []
+var arrows = []
+var numberOfParticles = 100
+var temp = "temp"
+// refactor wind, make object
+var wind
+var windAngle
+var windMag
 
 Number.prototype.map = function ( in_min , in_max , out_min , out_max ) {
     return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
 }
-
 
 function calculateHSL(hsb){
     // determine the lightness in the range [0,100]
@@ -23,7 +23,7 @@ function calculateHSL(hsb){
       };
     // correct a division-by-zero error
     if (isNaN(hsl.s)) hsl.s = 0; 
-    return hsl;
+    return hsl
 }
 
 
@@ -36,66 +36,67 @@ function getHsb(temp){
       };
 
     if(temp>32){
-       temp = 32;
+       temp = 32
       }
     else if(temp<-10){
-       temp = -10;
+       temp = -10
     }
     
-    hsb.h = 200 - temp.map(0, 40, 0, 250);
+    hsb.h = 200 - temp.map(0, 40, 0, 250)
 
-    return hsb;
+    return hsb
 }
 
-function drawBackground(hsb){
-    var hsl = calculateHSL(hsb);
-    background(hsb.h, hsb.s, hsb.b);
-    $('body').css('background', 'hsl(' + hsl.h + ',' + hsl.s + '%,' + hsl.l + '%)'); // css HSL
+function drawBackground(hsb) {
+    var hsl = calculateHSL(hsb)
+    background(hsb.h, hsb.s, hsb.b)
+    $('body').css('background', 'hsl(' + hsl.h + ',' + hsl.s + '%,' + hsl.l + '%)') // css HSL
 }
 
 
 function drawMainArrow(hsb, x, y){
-    push();
-    translate(x, y-48);
+    push()
+    translate(x, y-48)
+
     // Rotate by the wind's angle
     //draw base
-    rotate(wind.heading() + PI/2);
-    noStroke();
-    fill(255);
-    ellipse(0, 0, 48, 48);
+    rotate(wind.heading() + PI/2)
+    noStroke()
+    fill(255)
+    ellipse(0, 0, 48, 48)
 
     //draw arrow
-    scale(0.75);
-    stroke(hsb.h, hsb.s, hsb.b);
-    strokeWeight(2);
-    line(0, -16, 0, 16);
+    scale(0.75)
+    stroke(hsb.h, hsb.s, hsb.b)
+    strokeWeight(2)
+    line(0, -16, 0, 16)
 
-    noStroke();
-    fill(hsb.h, hsb.s, hsb.b);
-    triangle(0, -18, -6, -10, 6, -10);
-    pop();
+    noStroke()
+    fill(hsb.h, hsb.s, hsb.b)
+    triangle(0, -18, -6, -10, 6, -10)
+    pop()
 }
 
 
 //bound check
 function boundCheck(position){
-    if (position.x > width)  position.x = 0;
-    if (position.x < 0)      position.x = width;
-    if (position.y > height) position.y = 0;
-    if (position.y < 0)      position.y = height;
+    if (position.x > width)  position.x = 0
+    if (position.x < 0)      position.x = width
+    if (position.y > height) position.y = 0
+    if (position.y < 0)      position.y = height
 }
 
 // particle class
 function Particle () {
-    this.position = createVector(random(width), random(height));
-    this.size = random(8);
-    this.opacity = random(1);
+    this.position = createVector(random(width), random(height))
+    this.size = random(8)
+    this.opacity = random(1)
 
     this.draw = function(speed, i, mouseX, mouseY){
 
-      mouse = createVector(mouseX, mouseY);
-      normalizedPosition = this.position.copy();
-      distance = mouse.dist(normalizedPosition);
+      mouse = createVector(mouseX, mouseY)
+      normalizedPosition = this.position.copy()
+      distance = mouse.dist(normalizedPosition)
 
       repulsion = createVector(normalizedPosition.x - mouse.x - sin(i), normalizedPosition.y - mouse.y - cos(i));
       repulsion.normalize()
@@ -119,31 +120,31 @@ function Particle () {
       this.position.add(speed)
 
       // add some randomness
-      this.position.x = this.position.x + cos(i)/10;
-      this.position.y = this.position.y + sin(i)/10;
-      this.size = this.size;
+      this.position.x = this.position.x + cos(i)/10
+      this.position.y = this.position.y + sin(i)/10
+      this.size = this.size
       
-      boundCheck(this.position);
+      boundCheck(this.position)
       
-      noStroke();
-      fill(color(25, this.opacity));
-      ellipse(this.position.x, this.position.y, this.size, this.size);
+      noStroke()
+      fill(color(25, this.opacity))
+      ellipse(this.position.x, this.position.y, this.size, this.size)
     }   
 }
 
 // arrow class
 function Arrow () {
-    this.position = createVector(random(width), random(height));
-    this.size = random(10);
-    this.opacity = random(1);
+    this.position = createVector(random(width), random(height))
+    this.size = random(10)
+    this.opacity = random(1)
     
     this.draw = function(speed, i, mouseX, mouseY){
       
-      mouse = createVector(mouseX, mouseY);
-      normalizedPosition = this.position.copy();
-      distance = mouse.dist(normalizedPosition);
+      mouse = createVector(mouseX, mouseY)
+      normalizedPosition = this.position.copy()
+      distance = mouse.dist(normalizedPosition)
 
-      repulsion = createVector(normalizedPosition.x - mouse.x - sin(i), normalizedPosition.y - mouse.y - cos(i));
+      repulsion = createVector(normalizedPosition.x - mouse.x - sin(i), normalizedPosition.y - mouse.y - cos(i))
       repulsion.normalize()
      
       if (distance<30){
@@ -162,24 +163,24 @@ function Arrow () {
         this.position.add(repulsion)
       }
       
-      this.position.add(speed);
+      this.position.add(speed)
 
       // add some randomness
-      this.position.x = this.position.x + cos(i)/10;
-      this.position.y = this.position.y + sin(i)/10;
-      this.size = this.size;
+      this.position.x = this.position.x + cos(i)/10
+      this.position.y = this.position.y + sin(i)/10
+      this.size = this.size
       
-      boundCheck(this.position);
+      boundCheck(this.position)
       
-      stroke(color(255, this.opacity));
-      strokeWeight(1);
-      push();
-      translate(this.position.x, this.position.y);
+      stroke(color(255, this.opacity))
+      strokeWeight(1)
+      push()
+      translate(this.position.x, this.position.y)
       rotate(windAngle);
-      line(0, 0, this.size*2 ,0);
+      line(0, 0, this.size*2 ,0)
       //arrow
-      line(this.size*2, 0, this.size*1.4, -this.size/2);
-      line(this.size*2, 0, this.size*1.4, this.size/2);
+      line(this.size*2, 0, this.size*1.4, -this.size/2)
+      line(this.size*2, 0, this.size*1.4, this.size/2)
       pop();
     }   
 }
@@ -193,9 +194,9 @@ function getData() {
       headers: { "Content-type": "application/json" },
       success: function(location) {
       // get city - update to long & lat
-      console.log(location.city);
-      console.log("long: " + location.lon);
-      console.log("lat: " + location.lat);
+      console.log(location.city)
+      console.log("long: " + location.lon)
+      console.log("lat: " + location.lat)
       jQuery.ajax( { 
          url: 'http://api.wunderground.com/api/16edb6959424f26b/conditions/settings/q/'+ location.lat +',' + location.lon + '.json', 
          type: 'GET', 
@@ -215,111 +216,138 @@ function getData() {
                 wind = 1.0;
               } else {
                   if(float(weather.current_observation.wind_gust_kph) > float(weather.current_observation.wind_kph)){
-                    wind = 2*float(weather.current_observation.wind_gust_kph)/3 + float(weather.current_observation.wind_kph)/3;
+                    wind = 2*float(weather.current_observation.wind_gust_kph)/3 + float(weather.current_observation.wind_kph)/3
                   }
                   else if(float(weather.current_observation.wind_gust_kph) <= float(weather.current_observation.wind_kph)){
-                    wind = float(weather.current_observation.wind_kph);
+                    wind = float(weather.current_observation.wind_kph)
                   }
               }
-              gotWeather(weather.current_observation.temp_c, wind, weather.current_observation.wind_degrees);
+              gotWeather(weather.current_observation.temp_c, wind, weather.current_observation.wind_degrees)
             }
             } );
             }
   } );
 }
 
+function getData2(){
+  jQuery.ajax( { 
+    url: 'http://ip-api.com/json', 
+    type: 'GET', 
+    dataType: 'jsonp',
+    cache: false,
+    headers: { "Content-type": "application/json" },
+    success: function(location) {
+    // get city - update to long & lat
+      console.log(location.city);
+      console.log("long: " + location.lon)
+      console.log("lat: " + location.lat)
+
+      jQuery.ajax( { 
+        url: 'http://api.openweathermap.org/data/2.5/weather?lat=' + location.lat + '&lon=' + location.lon +  '&units=metric&APPID=4e6e342eef6a9a7f8ea3d5f3f95a7b84', 
+        type: 'GET', 
+        dataType: 'jsonp',
+        cache: false,
+        headers: { "Content-type": "application/json" },
+        success: function(weather) {
+          console.log(weather)
+        }
+      });
+  }
+} );
+}
+
 function setup() {
     createCanvas($(window).width(), $(window).height());
   
-    getData();
+    getData2()
   
-    wind = createVector();
+    wind = createVector()
     
-    numberOfParticles = floor(width/14);
+    numberOfParticles = floor(width/14)
     if(numberOfParticles>90){
-      numberOfParticles = 90;
+      numberOfParticles = 90
     }
       
     for(i=0; i<numberOfParticles; i++){
-      particle = new Particle(); 
-      particles.push(particle);
+      particle = new Particle() 
+      particles.push(particle)
       
-      arrow = new Arrow();
-      arrows.push(arrow);
+      arrow = new Arrow()
+      arrows.push(arrow)
     }
     
-    colorMode(HSB, 360, 100, 100, 1);
+    colorMode(HSB, 360, 100, 100, 1)
 }
 
 
 function draw() {
   // if temperature was read
   if(temp!="temp"){
-      hsb = getHsb(temp);
-      drawBackground(hsb);
+      hsb = getHsb(temp)
+      drawBackground(hsb)
       
       // removed mobile for now
       for(i=0; i<numberOfParticles; i++){
-          particles[i].draw(wind, i, mouseX, mouseY);
-          arrows[i].draw(wind, i , mouseX, mouseY);
+          particles[i].draw(wind, i, mouseX, mouseY)
+          arrows[i].draw(wind, i , mouseX, mouseY)
       }
       	//drawMainArrow(hsb, $(".message").offset().left + $(".message").width()/2, $(".message").offset().top);
         //console.log(status.length);
         if(windMag<5)
-            $(".message").html("Barely windy");
-        else if(5<=windMag && windMag<12)
-            $(".message").html("A bit windy");
-        else if(12<=windMag && windMag<20)
-            $(".message").html("Rather windy");
-        else if(20<windMag && windMag<30)
-            $(".message").html("Quite windy");
-        else if(windMag>30)
-            $(".message").html("Outright windy");
+            $(".message").html("Barely windy")
+        else if(5 <= windMag && windMag < 12)
+            $(".message").html("A bit windy")
+        else if(12 <= windMag && windMag < 20)
+            $(".message").html("Rather windy")
+        else if(20 < windMag && windMag < 30)
+            $(".message").html("Quite windy")
+        else if(windMag > 30)
+            $(".message").html("Outright windy")
         
     }
     
     $('html, body').on('touchstart touchmove', function(e){ 
      //prevent native touch activity like scrolling
-     e.preventDefault(); 
+     e.preventDefault()
   	});
 	 	
     // recheck weather data
     if (floor((millis()/10)%60000) == 0){
-        getData();
+        getData()
     }
 }
 
 function gotWeather(temperature, windSpeed, windDirection) {
     // Get the angle (convert to radians)
-    var angle = radians(180-windDirection);
-    windAngle = angle;
+    var angle = radians(180-windDirection)
+    windAngle = angle
     // Get the wind speed
-    windMag = Number(windSpeed);
-    temp = floor(temperature);
+    windMag = Number(windSpeed)
+    temp = floor(temperature)
 
     // Make a vector
-    wind = p5.Vector.fromAngle(angle);
+    wind = p5.Vector.fromAngle(angle)
     // multiply wind magnitude
-    wind.mult(windMag/4);
+    wind.mult(windMag/4)
 }
 
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
+    resizeCanvas(windowWidth, windowHeight)
     
-    particles = [];
-    arrows = [];
+    particles = []
+    arrows = []
     
-    numberOfParticles = floor(width/14);
+    numberOfParticles = floor(width/14)
     if(numberOfParticles>90){
-      numberOfParticles = 90;
+      numberOfParticles = 90
     }
       
     
     for(i=0; i<numberOfParticles; i++){
-      particle = new Particle(); 
-      particles.push(particle);
+      particle = new Particle()
+      particles.push(particle)
       
-      arrow = new Arrow();
-      arrows.push(arrow);
+      arrow = new Arrow()
+      arrows.push(arrow)
     }
 }
