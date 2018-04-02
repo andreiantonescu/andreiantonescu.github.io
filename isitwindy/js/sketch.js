@@ -176,8 +176,6 @@ function getData(){
     cache: false,
     headers: { "Content-type": "application/json" },
     success: function(location) {
-      location.lat = 48
-      location.lon = 2
       jQuery.ajax( { 
         url: 'http://api.openweathermap.org/data/2.5/weather?lat=' + location.lat + '&lon=' + location.lon +  '&units=metric&APPID=4e6e342eef6a9a7f8ea3d5f3f95a7b84', 
         type: 'GET', 
