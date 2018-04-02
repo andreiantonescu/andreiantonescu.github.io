@@ -28,20 +28,14 @@ function calculateHSL(hsb){
 }
 
 function getHsb(temp){
-    var hsb =
-      {
+    var hsb = {
         'h' : 0,
         's' : 80,
-        'b' : 96
+        'b' : 85
       };
-
-    if(temp>32){
-       temp = 32
-      }
-    else if(temp<-10){
-       temp = -10
-    }
     
+    temp = temp > 32 ? 32 : temp < -10 ? -10 : temp
+
     hsb.h = 200 - temp.map(0, 40, 0, 250)
 
     return hsb
@@ -164,7 +158,7 @@ function setWeather(temperature, windSpeed, windDirection) {
   wind.angle = radians(windDirection + 90)
   wind.speed = Number(windSpeed)
   wind.vector = p5.Vector.fromAngle(wind.angle) 
-  // multiply wind magnitude
+  // add wind magnitude 
   wind.vector.mult(wind.speed)
 }
 
