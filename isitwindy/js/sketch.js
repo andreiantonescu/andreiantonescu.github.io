@@ -157,6 +157,10 @@ function setWeather(temperature, windSpeed, windDirection) {
   if (!windDirection){
     windDirection = -90
   }
+  if (!windSpeed) { 
+    windSpeed = 0.5
+  }
+  
   // convert to radians and account for meteorological degrees
   wind.angle = radians(windDirection + 90)
   wind.speed = Number(windSpeed)
