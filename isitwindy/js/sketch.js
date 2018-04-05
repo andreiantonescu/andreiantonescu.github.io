@@ -160,7 +160,7 @@ function setWeather(temperature, windSpeed, windDirection) {
   if (!windSpeed) { 
     windSpeed = 0.5
   }
-  
+
   // convert to radians and account for meteorological degrees
   wind.angle = radians(windDirection + 90)
   wind.speed = Number(windSpeed)
@@ -187,6 +187,9 @@ function getData(){
         success: function(weather) {
           console.log(weather)
           setWeather(weather.main.temp, weather.wind.speed, weather.wind.deg)
+          setTimeout(function(){ 
+            $(".spinner-container").css("opacity", 0)
+          }, 500);
         }
       });
   }
@@ -230,15 +233,15 @@ function draw() {
       }
 
       if(wind.speed < 2)
-          $(".message").html("Barely windy")
+          $(".wind").html("Barely windy")
       else if(2 <= wind.speed && wind.speed < 6)
-          $(".message").html("A bit windy")
+          $(".wind").html("A bit windy")
       else if(6 <= wind.speed && wind.speed < 9)
-          $(".message").html("Quite windy")
+          $(".wind").html("Quite windy")
       else if(9 < wind.speed && wind.speed < 12)
-          $(".message").html("Really windy")
+          $(".wind").html("Really windy")
       else if(wind.speed >= 12)
-          $(".message").html("Outright windy")
+          $(".wind").html("Outright windy")
     }
     
     $('html, body').on('touchstart touchmove', function(e){ 
@@ -258,7 +261,6 @@ function windowResized() {
     if(numberOfParticles>90){
       numberOfParticles = 90
     }
-      
     
     for(i=0; i<numberOfParticles; i++){
       particle = new Particle()
