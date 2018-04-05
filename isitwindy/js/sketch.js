@@ -154,12 +154,16 @@ function Arrow () {
 function setWeather(temperature, windSpeed, windDirection) {
   temp = floor(temperature)
 
+  if (!windDirection){
+    windDirection = -90
+  }
   // convert to radians and account for meteorological degrees
   wind.angle = radians(windDirection + 90)
   wind.speed = Number(windSpeed)
+
   wind.vector = p5.Vector.fromAngle(wind.angle) 
   // add wind magnitude 
-  wind.vector.mult(wind.speed)
+  wind.vector.mult(wind.speed/4)
 }
 
 function getData(){
