@@ -167,7 +167,7 @@ function setWeather(temperature, windSpeed, windDirection) {
 
   wind.vector = p5.Vector.fromAngle(wind.angle) 
   // add wind magnitude 
-  wind.vector.mult(wind.speed/4)
+  wind.vector.mult(wind.speed/3)
 }
 
 function getData(){
